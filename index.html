@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Academic Intelligence System | One English Tepic 2026</title>
+    
+    <!-- FRAMEWORKS & FONTS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <style>
+        :root {
+            --oe-cyan: #00A8B5;
+            --oe-cyan-dark: #00818c;
+            --oe-navy: #0F172A;
+            --oe-slate: #64748b;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f1f5f9;
+            color: #1e293b;
+        }
+
+        h1, h2, h3, h4, .font-poppins {
+            font-family: 'Poppins', sans-serif;
+        }
+
+        /* DISEÑO DE INTERFAZ APP (CENTRADA) */
+        .app-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 3rem 1rem;
+        }
+
+        .form-card {
+            background: white;
+            border-radius: 1.5rem;
+            padding: 2rem;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            margin-bottom: 2rem;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #f1f5f9;
+        }
+
+        .section-header i {
+            color: var(--oe-cyan);
+            font-size: 1.25rem;
+        }
+
+        .section-header h3 {
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            font-size: 0.75rem;
+            color: #64748b;
+        }
+
+        /* INPUTS Y CONTROLES */
+        .input-label {
+            display: block;
+            font-size: 0.7rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #94a3b8;
+            margin-bottom: 0.5rem;
+        }
+
+        .control-input {
+            width: 100%;
+            background-color: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.75rem;
+            padding: 0.75rem 1rem;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+            outline: none;
+        }
+
+        .control-input:focus {
+            border-color: var(--oe-cyan);
+            box-shadow: 0 0 0 4px rgba(0, 168, 181, 0.1);
+            background-color: white;
+        }
+
+        /* TEST VAK STYLES */
+        .vak-question-box {
+            padding: 1.25rem;
+            background-color: #f8fafc;
+            border-radius: 1rem;
+            margin-bottom: 1rem;
+            border: 1px solid transparent;
+            transition: border 0.3s;
+        }
+
+        .vak-question-box:hover {
+            border-color: #e2e8f0;
+        }
+
+        .option-label {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.5rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            font-size: 0.8rem;
+            color: #475569;
+            transition: background 0.2s;
+        }
+
+        .option-label:hover {
+            background-color: #f1f5f9;
+        }
+
+        .option-label input {
+            accent-color: var(--oe-cyan);
+            width: 1rem;
+            height: 1rem;
+        }
+
+        /* OCULTAR REPORTE EN PANTALLA, MOSTRAR EN IMPRESIÓN */
+        #report-render {
+            display: none;
+        }
+
+        @media print {
+            .no-print { display: none !important; }
+            body { background: white !important; }
+            #report-render { 
+                display: block !important;
+                box-shadow: none !important; 
+                border: none !important; 
+                margin: 0 !important;
+                padding: 1.5cm !important;
+                width: 100% !important;
+            }
+            @page { margin: 0; size: letter; }
+        }
+
+        /* ESTILOS DEL REPORTE (PDF) */
+        .document-paper {
+            background-color: white;
+            width: 100%;
+            min-height: 1100px;
+            padding: 4rem;
+            position: relative;
+        }
+
+        .report-header {
+            border-bottom: 4px solid var(--oe-navy);
+            padding-bottom: 2rem;
+            margin-bottom: 2.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+
+        .system-progress-bar {
+            height: 1.25rem;
+            background-color: #f1f5f9;
+            border-radius: 1rem;
+            overflow: hidden;
+            display: flex;
+            margin: 1.5rem 0;
+        }
+
+        .bar-40 { background-color: var(--oe-cyan); width: 40%; }
+        .bar-30a { background-color: var(--oe-navy); width: 30%; }
+        .bar-30b { background-color: #334155; width: 30%; }
+    </style>
+</head>
+<body>
+
+    <div class="app-container no-print">
+        
+        <!-- Branding -->
+        <header class="flex flex-col items-center text-center gap-4 mb-12">
+            <div class="bg-white p-4 rounded-3xl shadow-md border border-slate-100">
+                <img src="https://lh3.googleusercontent.com/d/1jbTKeD97EJkbHCH894loN25nUHVlVscd" alt="Logo" class="h-12">
+            </div>
+            <div>
+                <h1 class="text-3xl font-black text-slate-800 tracking-tighter leading-none uppercase italic">Strategy <span class="text-cyan-600">2026</span></h1>
+                <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mt-2">Sistema de Inteligencia Académica • Tepic</p>
+            </div>
+        </header>
+
+        <!-- FORMULARIO -->
+        <form id="main-form">
+            
+            <!-- SECCIÓN 1: PERFIL -->
+            <div class="form-card">
+                <div class="section-header">
+                    <i class="fa-solid fa-user-circle"></i>
+                    <h3>01. Información del Estudiante</h3>
+                </div>
+                <div class="space-y-6">
+                    <div>
+                        <label class="input-label">Nombre Completo del Alumno</label>
+                        <input type="text" id="f_name" placeholder="Ej. Ricardo Morales" class="control-input" oninput="sync()">
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="input-label">Ocupación / Profesión</label>
+                            <input type="text" id="f_job" placeholder="Ej. Ingeniero Civil" class="control-input" oninput="sync()">
+                        </div>
+                        <div>
+                            <label class="input-label">Fecha de Evaluación</label>
+                            <input type="date" id="f_date" class="control-input" oninput="sync()">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="input-label">Motivación o Meta Principal</label>
+                        <input type="text" id="f_motivation" placeholder="Ej. Necesita hablar en juntas de negocios..." class="control-input" oninput="sync()">
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECCIÓN 2: TEST VAK -->
+            <div class="form-card">
+                <div class="section-header">
+                    <i class="fa-solid fa-clipboard-check"></i>
+                    <h3>02. Test de Estilo de Aprendizaje (VAK)</h3>
+                </div>
+                <div class="bg-cyan-50 p-5 rounded-2xl mb-8 border border-cyan-100">
+                    <p class="text-[10px] text-cyan-700 font-black uppercase mb-1 tracking-widest">Procedimiento:</p>
+                    <p class="text-xs text-cyan-600 leading-relaxed">Realiza estas preguntas al estudiante de manera natural. Marca la opción que resuene más con su forma de ser.</p>
+                </div>
+                
+                <div id="vak-questions-container" class="space-y-4">
+                    <!-- Inyectado por JS -->
+                </div>
+            </div>
+
+            <!-- SECCIÓN 3: CONTEXTO -->
+            <div class="form-card">
+                <div class="section-header">
+                    <i class="fa-solid fa-brain"></i>
+                    <h3>03. Contexto Cualitativo</h3>
+                </div>
+                <div class="space-y-6">
+                    <div>
+                        <label class="input-label">Antecedentes con el Idioma</label>
+                        <select id="f_exposure" class="control-input" onchange="sync()">
+                            <option value="Nulo: Sin contacto previo formal. Sin vicios.">Totalmente nuevo (Nulo)</option>
+                            <option value="Escolar: Bases gramaticales pero nula habla.">Escolarizado (Viciado de gramática)</option>
+                            <option value="Pasivo: Entiende contexto pero no produce habla.">Pasivo (Entiende pero no habla)</option>
+                            <option value="Empírico: Aprendió en la práctica. Habla sin reglas.">Empírico (Habla pero sin bases)</option>
+                        </select>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="input-label">Habilidad Tecnológica</label>
+                            <select id="f_tech" class="control-input" onchange="sync()">
+                                <option value="Alto">Alto - Independiente</option>
+                                <option value="Medio">Medio - Requiere ayuda</option>
+                                <option value="Bajo">Bajo - Resistente</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="input-label">Resiliencia Emocional</label>
+                            <select id="f_resilience" class="control-input" onchange="sync()">
+                                <option value="Resiliente">Resiliente (Acepta el error)</option>
+                                <option value="Frustrable">Frustrable (Teme al error)</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="input-label">Obstáculo Principal Detectado</label>
+                        <select id="f_barrier" class="control-input" onchange="sync()">
+                            <option value="Miedo al ridículo / Bloqueo oral">Miedo al ridículo / Vergüenza</option>
+                            <option value="Traducción literal constante">Traduce todo en su mente</option>
+                            <option value="Dificultad de sonidos (Fonética)">Mala pronunciación</option>
+                            <option value="Falta de tiempo para la plataforma">Agenda muy saturada</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECCIÓN 4: ESTRATEGIA -->
+            <div class="form-card bg-slate-900 border-none shadow-2xl text-white">
+                <div class="section-header border-slate-800">
+                    <i class="fa-solid fa-shield-halved text-cyan-400"></i>
+                    <h3 class="text-slate-400">04. Estrategia y Plan Académico</h3>
+                </div>
+                <div class="space-y-6">
+                    <div>
+                        <label class="input-label text-slate-500">¿Se recomienda el Plan de 6 Horas?</label>
+                        <div class="flex gap-6 mt-3">
+                            <label class="flex items-center gap-3 cursor-pointer text-sm font-bold">
+                                <input type="radio" name="plan6" value="RECOMENDADO" checked onchange="sync()" class="w-4 h-4 accent-cyan-500"> SÍ, ACTIVAR
+                            </label>
+                            <label class="flex items-center gap-3 cursor-pointer text-sm font-bold">
+                                <input type="radio" name="plan6" value="NO REQUERIDO" onchange="sync()" class="w-4 h-4 accent-cyan-500"> NO ES NECESARIO
+                            </label>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="input-label text-slate-500">Instrucciones de Manejo Docente</label>
+                        <textarea id="f_manual" class="control-input bg-slate-800 border-slate-700 text-white h-32 resize-none" placeholder="Consejos para que el teacher sepa cómo lidiar con este alumno..." oninput="sync()"></textarea>
+                    </div>
+                    <div>
+                        <label class="input-label text-slate-500">Teacher Evaluador</label>
+                        <input type="text" id="f_teacher" class="control-input bg-slate-800 border-slate-700 text-white" placeholder="Tu nombre" oninput="sync()">
+                    </div>
+                </div>
+            </div>
+
+            <!-- BOTÓN GENERAR -->
+            <button type="button" onclick="window.print()" class="w-full bg-cyan-600 hover:bg-cyan-700 text-white font-black py-6 rounded-3xl shadow-2xl transition-all transform hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-4 text-lg">
+                <i class="fa-solid fa-file-export"></i>
+                GENERAR Y DESCARGAR REPORTE
+            </button>
+
+        </form>
+    </div>
+
+    <!-- 
+         REPORTE OCULTO (SOLO PARA PDF) 
+    -->
+    <div id="report-render" class="document-paper">
+        
+        <header class="report-header">
+            <div>
+                <img src="https://lh3.googleusercontent.com/d/1jbTKeD97EJkbHCH894loN25nUHVlVscd" alt="Logo" class="h-20 mb-6">
+                <h2 class="text-3xl font-black uppercase tracking-tighter text-slate-900 leading-none">Perfil de Ingreso Académico</h2>
+                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-[0.4em] mt-3 italic">One English Tepic • Estrategia 2026</p>
+            </div>
+            <div class="text-right">
+                <div id="p_date" class="text-xs font-black uppercase text-slate-900">---</div>
+                <div class="bg-cyan-600 text-white text-[8px] font-black uppercase px-4 py-2 mt-4 inline-block tracking-widest rounded-sm">Confidencial • Uso Docente</div>
+            </div>
+        </header>
+
+        <!-- IDENTIDAD -->
+        <div class="grid grid-cols-12 gap-12 mb-12">
+            <div class="col-span-7 border-l-8 border-cyan-500 pl-8">
+                <span class="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em] block mb-2">Nombre del Estudiante</span>
+                <div id="p_name" class="text-2xl font-black text-slate-900 uppercase leading-none">---</div>
+                <div id="p_job" class="text-xs font-bold text-cyan-700 mt-3 uppercase tracking-wider">---</div>
+            </div>
+            <div class="col-span-5 border-l-8 border-slate-200 pl-8">
+                <span class="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em] block mb-2">Estilo Dominante VAK</span>
+                <div id="p_vak_result" class="text-2xl font-black text-slate-900 uppercase italic tracking-tighter">Pendiente</div>
+            </div>
+        </div>
+
+        <!-- SISTEMA 40/30/30 -->
+        <div class="bg-slate-50 rounded-[3rem] p-12 border border-slate-200 mb-12">
+            <h4 class="text-[10px] font-black text-slate-400 uppercase mb-8 tracking-[0.4em] text-center underline decoration-cyan-500 decoration-4 underline-offset-8">Modelo de Carga Académica • Sistema 40/30/30</h4>
+            <div class="system-progress-bar">
+                <div class="bar-40 flex items-center justify-center text-[7px] text-white font-black">40% AUTONOMÍA</div>
+                <div class="bar-30a flex items-center justify-center text-[7px] text-white font-black">30% RECURSOS</div>
+                <div class="bar-30b flex items-center justify-center text-[7px] text-white font-black">30% TEACHER</div>
+            </div>
+            <div class="grid grid-cols-3 gap-8 text-center text-[9px] text-slate-500 font-black uppercase tracking-widest">
+                <div>Práctica LMS</div>
+                <div>Libro / Guías</div>
+                <div>Oral Practice</div>
+            </div>
+        </div>
+
+        <!-- DIAGNÓSTICO -->
+        <div class="mb-12">
+            <h4 class="text-[10px] font-black text-white bg-slate-900 px-8 py-4 uppercase tracking-[0.3em] mb-10 rounded-sm text-center">Diagnóstico Cualitativo Estratégico</h4>
+            <div class="grid grid-cols-2 gap-10">
+                <div class="space-y-10">
+                    <div class="p-8 bg-white border-2 border-slate-100 rounded-3xl">
+                        <span class="text-[10px] font-black text-cyan-600 uppercase block mb-3 tracking-widest">Historia con el Idioma</span>
+                        <p id="p_exposure" class="text-xs font-bold text-slate-700 italic leading-relaxed">---</p>
+                    </div>
+                    <div class="p-8 bg-white border-2 border-slate-100 rounded-3xl">
+                        <span class="text-[10px] font-black text-slate-400 uppercase block mb-3 tracking-widest">Barrera Crítica Detectada</span>
+                        <p id="p_barrier" class="text-xs font-bold text-slate-900 italic leading-relaxed">---</p>
+                    </div>
+                </div>
+                <div class="space-y-10">
+                    <div class="p-8 bg-white border-2 border-slate-100 rounded-3xl">
+                        <span class="text-[10px] font-black text-slate-400 uppercase block mb-3 tracking-widest">Motivación / Meta Real</span>
+                        <p id="p_motivation" class="text-xs font-bold text-slate-700 italic leading-relaxed">---</p>
+                    </div>
+                    <div class="grid grid-cols-2 gap-6">
+                        <div class="p-6 bg-slate-50 rounded-2xl text-center">
+                            <span class="text-[9px] font-black text-slate-400 uppercase block mb-2">Perfil Tech</span>
+                            <span id="p_tech" class="text-xs font-black text-slate-900 uppercase">---</span>
+                        </div>
+                        <div id="p_res_box" class="p-6 bg-slate-50 rounded-2xl text-center border-2 border-transparent">
+                            <span class="text-[9px] font-black text-slate-400 uppercase block mb-2">Resiliencia</span>
+                            <span id="p_res" class="text-xs font-black text-slate-900 uppercase">---</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- MANUAL DE MANEJO -->
+        <div class="mb-12">
+            <h5 class="text-[11px] font-black text-slate-900 uppercase tracking-[0.3em] mb-6 flex items-center gap-4">
+                <span class="w-3 h-3 bg-cyan-500 rounded-full"></span> Manual de Operación (Estrategia Docente)
+            </h5>
+            <div class="bg-white border-[6px] border-slate-900 rounded-[4rem] p-12 relative shadow-2xl">
+                <p id="p_manual" class="text-sm leading-relaxed italic text-slate-800 border-l-8 border-cyan-600 pl-10 font-medium min-h-[100px]">---</p>
+                
+                <div id="p_auto_tips" class="mt-10 grid grid-cols-2 gap-12 pt-10 border-t-2 border-slate-100">
+                    <!-- Dinámico -->
+                </div>
+            </div>
+        </div>
+
+        <!-- PLAN 6H -->
+        <div id="p_plan_box" class="mb-20 p-10 border-8 border-slate-100 border-dotted rounded-[3.5rem] flex items-center gap-16">
+            <div class="w-[40%] text-center border-r-4 border-slate-100 pr-12">
+                <span class="text-[10px] font-black text-slate-400 uppercase block mb-3 tracking-widest">Acompañamiento Inicial</span>
+                <div id="p_plan_status" class="text-4xl font-black italic text-slate-200 tracking-tighter uppercase leading-none">---</div>
+                <p class="text-[9px] font-black text-slate-400 mt-3 uppercase tracking-[0.3em] italic">Protocolo 6 Horas</p>
+            </div>
+            <div class="w-[60%]">
+                <p class="text-[11px] leading-relaxed text-slate-500 italic font-bold">
+                    El Plan de 6 Horas se activa para asegurar una transición fluida hacia el sistema 40/30/30, enfocándose en eliminar el miedo al error y familiarizar al alumno con la plataforma.
+                </p>
+            </div>
+        </div>
+
+        <!-- FIRMAS -->
+        <div class="grid grid-cols-2 gap-32 pt-12 mt-auto">
+            <div class="text-center">
+                <div class="border-t-4 border-slate-900 pt-6">
+                    <p class="text-[11px] font-black uppercase tracking-widest text-slate-900">Evaluador Académico</p>
+                    <p id="p_teacher" class="text-xs font-black text-slate-400 mt-3 uppercase tracking-tighter underline">---</p>
+                </div>
+            </div>
+            <div class="text-center">
+                <div class="border-t-4 border-slate-900 pt-6">
+                    <p class="text-[11px] font-black uppercase tracking-widest text-slate-900">Validación Tepic</p>
+                    <p class="text-xs font-black text-slate-400 mt-3 uppercase italic tracking-tighter">Coordinación de Calidad</p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- 
+         LÓGICA JAVASCRIPT 
+    -->
+    <script>
+        const vakData = [
+            { q: "¿Cómo prefieres aprender a usar un aparato nuevo?", o: ["Viendo un video o el manual", "Escuchando a alguien explicarlo", "Probándolo y moviendo los botones"] },
+            { q: "Cuando lees por gusto, ¿qué haces?", o: ["Imaginas todo como una película", "Dices las palabras en voz baja", "Mueves el cuerpo o sigues con el dedo"] },
+            { q: "Para recordar un número de teléfono...", o: ["Lo ves escrito en tu mente", "Lo repites en voz alta varias veces", "Lo marcas con tus dedos en el aire"] },
+            { q: "Cuando platicas con alguien...", o: ["Te fijas mucho en sus ojos y ropa", "Te concentras en su tono de voz", "Haces muchos gestos con las manos"] },
+            { q: "En un examen, te va mejor si es...", o: ["De opción múltiple o dibujos", "Oral o con puras preguntas", "De hacer algo práctico o físico"] },
+            { q: "Al comprar ropa, ¿qué es lo más importante?", o: ["Que se vea bien y combine", "Que te digan que está a la moda", "Que se sienta suave y cómoda"] },
+            { q: "Si te pierdes en la calle, tú...", o: ["Buscas un mapa o ves el GPS", "Pides que alguien te guíe", "Sigues caminando hasta reconocer algo"] },
+            { q: "¿Qué te gusta más para estudiar?", o: ["Usar colores y plumones", "Grabar la clase para oírla", "Hacer experimentos o maquetas"] },
+            { q: "Cuando estás aburrido en una plática...", o: ["Te pones a ver las paredes", "Te pones a tararear o silbar", "Te mueves mucho en el asiento"] },
+            { q: "De una fiesta, recuerdas más...", o: ["Las caras de los invitados", "Lo que platicaste con ellos", "Lo que bailaste y la comida"] },
+            { q: "¿Cómo te gusta que sea un Teacher?", o: ["Que use muchas presentaciones", "Que cuente historias geniales", "Que haga dinámicas de moverse"] },
+            { q: "Al comprar un carro, te fijas en...", o: ["El diseño y el color", "El sonido del motor y la música", "Cómo se siente al manejarlo"] },
+            { q: "Cuando estás muy emocionado...", o: ["Te quedas callado observando", "Hablas rápido y mucho", "Saltas o abrazas a alguien"] },
+            { q: "Para concentrarte bien necesitas...", o: ["Que todo esté muy bien iluminado", "Que haya algún sonido o música", "Estar en una posición muy cómoda"] },
+            { q: "Al explicar algo a un amigo...", o: ["Haces dibujos o esquemas", "Usas ejemplos que escuchaste", "Mueves las manos para explicarlo"] },
+            { q: "Si recibes instrucciones, prefieres...", o: ["Que te las anoten en papel", "Que te las digan paso a paso", "Que lo hagan contigo una vez"] },
+            { q: "En tu tiempo libre prefieres...", o: ["Ver una serie o leer", "Oír música o un podcast", "Hacer ejercicio o manualidades"] },
+            { q: "Al recordar un viaje piensas en...", o: ["Las fotos y paisajes", "Los ruidos y pláticas", "Las sensaciones y el clima"] }
+        ];
+
+        function initVak() {
+            const container = document.getElementById('vak-questions-container');
+            vakData.forEach((item, i) => {
+                const div = document.createElement('div');
+                div.className = 'vak-question-box';
+                div.innerHTML = `
+                    <p class="text-[11px] font-black text-slate-800 mb-3 leading-tight">${i+1}. ${item.q}</p>
+                    <div class="space-y-1">
+                        <label class="option-label"><input type="radio" name="q${i}" value="v" onchange="sync()"> ${item.o[0]}</label>
+                        <label class="option-label"><input type="radio" name="q${i}" value="a" onchange="sync()"> ${item.o[1]}</label>
+                        <label class="option-label"><input type="radio" name="q${i}" value="k" onchange="sync()"> ${item.o[2]}</label>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function sync() {
+            const map = { f_name: 'p_name', f_job: 'p_job', f_motivation: 'p_motivation', f_exposure: 'p_exposure', f_tech: 'p_tech', f_resilience: 'p_res', f_barrier: 'p_barrier', f_manual: 'p_manual', f_teacher: 'p_teacher' };
+            for(let id in map) document.getElementById(map[id]).innerText = document.getElementById(id).value || '---';
+
+            const dateVal = document.getElementById('f_date').value;
+            if (dateVal) {
+                const d = new Date(dateVal + 'T00:00:00');
+                document.getElementById('p_date').innerText = d.toLocaleDateString('es-ES', {day:'2-digit', month:'long', year:'numeric'}).toUpperCase();
+            }
+
+            const plan6 = document.querySelector('input[name="plan6"]:checked').value;
+            const pStatus = document.getElementById('p_plan_status');
+            const pBox = document.getElementById('p_plan_box');
+            pStatus.innerText = plan6;
+            if (plan6 === 'RECOMENDADO') {
+                pStatus.className = "text-3xl font-black italic text-cyan-600 tracking-tighter uppercase leading-none";
+                pBox.className = "mb-16 p-8 border-4 border-cyan-500 bg-cyan-50 rounded-[2.5rem] flex items-center gap-12 transition-all";
+            } else {
+                pStatus.className = "text-3xl font-black italic text-slate-200 tracking-tighter uppercase leading-none";
+                pBox.className = "mb-16 p-8 border-4 border-slate-100 border-dashed rounded-[2.5rem] flex items-center gap-12 transition-all";
+            }
+
+            const resVal = document.getElementById('f_resilience').value;
+            const resBox = document.getElementById('p_res_box');
+            if (resVal === 'Frustrable') {
+                resBox.classList.add('border-rose-500', 'bg-rose-50');
+            } else {
+                resBox.classList.remove('border-rose-500', 'bg-rose-50');
+            }
+
+            let v=0, a=0, k=0;
+            vakData.forEach((_, i) => {
+                const sel = document.querySelector(`input[name="q${i}"]:checked`);
+                if(sel) { if(sel.value==='v') v++; if(sel.value==='a') a++; if(sel.value==='k') k++; }
+            });
+
+            let dom = "Pendiente";
+            if(v+a+k > 0) {
+                if(v>=a && v>=k) dom = "Visual";
+                else if(a>=v && a>=k) dom = "Auditivo";
+                else dom = "Kinestésico";
+            }
+            document.getElementById('p_vak_result').innerText = dom;
+
+            const tips = document.getElementById('p_auto_tips');
+            let tV = "Esperando diagnóstico...", tM = "";
+            if(dom === "Visual") tV = "Usar pizarra y plataforma. El alumno no cree si no lo ve.";
+            if(dom === "Auditivo") tV = "Priorizar repetición coral. No permitir libreta durante el audio.";
+            if(dom === "Kinestésico") tV = "Hacer dinámicas de movimiento y roleplays con gestos.";
+
+            if(resVal === "Frustrable") tM = "Corregir indirectamente. Nunca romper el flujo.";
+            else tM = "Corrección técnica permitida. El alumno disfruta el reto.";
+
+            tips.innerHTML = `
+                <div><span class="text-[9px] font-black text-cyan-600 uppercase block mb-1 tracking-widest">Estrategia VAK</span><p class="text-[11px] text-slate-500 italic leading-snug">${tV}</p></div>
+                <div><span class="text-[9px] font-black text-slate-900 uppercase block mb-1 tracking-widest">Foco Emocional</span><p class="text-[11px] text-slate-500 italic leading-snug">${tM}</p></div>
+            `;
+        }
+
+        window.onload = () => {
+            initVak();
+            document.getElementById('f_date').valueAsDate = new Date();
+            sync();
+        };
+    </script>
+</body>
+</html>
